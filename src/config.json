@@ -1,0 +1,14 @@
+{
+    "database":
+    {
+        "drive":"mysql",
+        "host":"sysdm.clicnjjjuudc.ap-southeast-2.rds.amazonaws.com",
+        "port":"3306",
+        "user":"sysdm",
+        "pass":"sysdm2018",
+        "schema":"sysdm"
+    },
+    "port":"3000",
+    "bodyLimit": "100kb",
+	"corsHeaders": ["Link"]
+}
