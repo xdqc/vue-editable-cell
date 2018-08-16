@@ -3,7 +3,7 @@ import config from "./config.json";
 
 
 export default callback => {
-    let db = mysql.createConnection({
+    let db = mysql.createPool({
         host     : config.database.host,
         port     : config.database.port,
         user     : config.database.user,

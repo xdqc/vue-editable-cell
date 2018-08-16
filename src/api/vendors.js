@@ -31,7 +31,7 @@ export default ({ config, db }) => {
 
 	//rest api to update record into mysql database
 	api.put('/', (req, res) => {
-		db.query('UPDATE vendor SET `name`=?,`type`=? where `id`=?', [req.body.name, req.body.type, req.body.Id], (error, results, fields) => {
+		db.query('UPDATE vendor SET `name`=?,`type`=? where `id`=?', [req.body.name, req.body.type, req.body.id], (error, results, fields) => {
 			if (error) throw error;
 			res.end(JSON.stringify(results));
 		});
@@ -40,7 +40,7 @@ export default ({ config, db }) => {
 	//rest api to delete record from mysql database
 	api.delete('/', (req, res) => {
 		console.log(req.body);
-		db.query('DELETE FROM vendor WHERE `id`=?', [req.body.Id], (error, results, fields) => {
+		db.query('DELETE FROM vendor WHERE `id`=?', [req.body.id], (error, results, fields) => {
 			if (error) throw error;
 			res.end('Record has been deleted!');
 		});
