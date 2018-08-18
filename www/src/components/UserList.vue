@@ -43,6 +43,7 @@ export default {
   data() {
     return {
       url: process.env.VUE_APP_URL_API,
+      usedb: process.env.VUE_APP_USE_DB,
       userInfo: [],
       currentPage: 1,
       perPage: 20,
@@ -75,7 +76,28 @@ export default {
   },
   //`mounted` is analogy to java constructor, being called automatically
   mounted() {
-    axios.get(this.url + "/users").then(resp => (this.userInfo = resp.data));
+    if (this.usedb == "mysql") {
+      axios.get(this.url + "/users").then(resp => (this.userInfo = resp.data));
+    } else if (this.usedb == "dynamo") {
+      // eslint-disable-next-line
+      var docClient = new AWS.DynamoDB.DocumentClient();
+
+      var params = {
+        TableName: "test-table",
+        FilterExpression: "attribute_exists(#t)",
+        ExpressionAttributeNames: { "#t": "sex" }
+      };
+
+      docClient
+        .scan(params)
+        .promise()
+        .then((data, err)=> {
+          if (err) console.log(err);
+          else {
+            this.userInfo = data.Items;            
+          }
+        });
+    }
   },
   methods: {},
   filters: {

@@ -21,6 +21,7 @@ export default {
   data() {
     return {
       url: process.env.VUE_APP_URL_API,
+      usedb: process.env.VUE_APP_USE_DB,
       isEdditing: false,
       add_value: "<null>",
       showDismissibleAlert: false
@@ -33,20 +34,46 @@ export default {
     },
     renameVendor: function(event, v_id, v_column, v_value) {
       if (v_value.trim() != this.value) {
-        axios
-          .put(this.url + "/" + this.table + "/" + v_id, {
-            [v_column]: v_value.trim()
-          })
-          .then(resp => {
-            if (resp.data.changedRows === 1) {
-              if (resp.data.warningCount !== 0) {
-                this.showDismissibleAlert = true;
-              } else {
+        if (this.usedb == "mysql") {
+          axios
+            .put(this.url + "/" + this.table + "/" + v_id, {
+              [v_column]: v_value.trim()
+            })
+            .then(resp => {
+              if (resp.data.changedRows === 1) {
+                if (resp.data.warningCount !== 0) {
+                  this.showDismissibleAlert = true;
+                } else {
+                  this.$emit("edit_value", v_value);
+                  this.showDismissibleAlert = false;
+                }
+              }
+            });
+        } else if (this.usedb == "dynamo") {
+          // eslint-disable-next-line
+          var docClient = new AWS.DynamoDB.DocumentClient();
+
+          var params = {
+            TableName: "test-table",
+            Key: { id: v_id },
+            UpdateExpression: "set #col = :v ",
+            ExpressionAttributeNames: { "#col": v_column },
+            ExpressionAttributeValues: {
+              ":v": v_value.trim()
+            }
+          };
+
+          docClient
+            .update(params)
+            .promise()
+            .then((data, err) => {
+              if (err) console.log(err);
+              else {
                 this.$emit("edit_value", v_value);
                 this.showDismissibleAlert = false;
               }
-            }
-          });
+            });
+        }
       }
       this.isEdditing = false;
     }
